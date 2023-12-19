@@ -7,13 +7,12 @@
 
   * [Overview](#overview)
   * [Test](#test)
-  * [Hardware](#hardware)
   * [Software](#software)
   	* [API](#api)
 	* [I2C](#i2c)
 	* [Fonts](#fonts)
 	* [Bitmaps](#bitmaps)
-  * [Output](#output)
+  * [Screenshots](#screenshots)
 
 
 ## Overview
@@ -56,12 +55,6 @@ There are 8 paths , comment in one path and one path only.
 | SPEED_TEST | Frame rate per second test | 128x64 |
 | TEXT |Tests Text & fonts  | 128x64 |
 | GRAPHICS | Tests graphics  | 128x64 |
-
-## Hardware
-
-Manufacturers diagram showing connections.
-
-![ wiring ](https://github.com/gavinlyonsrepo/SSD1306_OLED_RPI/blob/main/extras/image/wiring.jpg)
 
 ## Software
 
@@ -133,7 +126,8 @@ The new ASCII font must have following font structure.
 First 4 bytes are control bytes followed by vertically addressed font data.
 
 ```
-// An 8 by 8 character size font starting at ASCII offset 0x20 in ASCII table with 0x5F characters in font. 
+// An 8 by 8 character size font starting at 
+// ASCII offset 0x20 in ASCII table with 0x5F characters in font. 
 static const uint8_t FontExample[] =
 {
 0x08, 0x08, 0x20, 0x5f,   // x-size, y-size, offset, total characters
@@ -143,6 +137,8 @@ static const uint8_t FontExample[] =
 
 Some of the fonts packaged with library came from [URL](http://rinkydinkelectronics.com/).
 If you have picture of font like so.
+
+![ OLED ](https://github.com/gavinlyonsrepo/SSD1306_OLED_PICO/blob/main/extra/image/hallfetica_normal.png)
 
 There is a monochrome font maker there at [URL](http://rinkydinkelectronics.com/t_make_font_file_mono.php) 
 
@@ -159,6 +155,6 @@ Two different bitmaps methods can be used.
 Bitmaps can be turned to data [here at link]( https://javl.github.io/image2cpp/) 
 See example file "BITMAP" for more details.
 
-## Output
+## Screenshots
 
-TODO
+TODO - WIP.
