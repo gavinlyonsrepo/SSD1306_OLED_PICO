@@ -5,7 +5,7 @@
 	@details 
 		-#  1. pFontDefault  6 by 8
 		-#  2. pFontWide  9 by 8 (NO LOWERCASE)
-		-#  3. pFontpico 3 by 8
+		-#  3. pFontpico 3 by 6
 		-#  4. pFontSinclairS 8 by 8
 		-#  5. pFontMega  Mega 16 by 16
 		-#  6. pFontArialBold 16 by 16

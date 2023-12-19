@@ -138,7 +138,7 @@ static const uint8_t FontExample[] =
 Some of the fonts packaged with library came from [URL](http://rinkydinkelectronics.com/).
 If you have picture of font like so.
 
-![ OLED ](https://github.com/gavinlyonsrepo/SSD1306_OLED_PICO/blob/main/extra/image/hallfetica_normal.png)
+![ font ](https://github.com/gavinlyonsrepo/SSD1306_OLED_PICO/blob/main/extra/image/hallfetica_normal.png)
 
 There is a monochrome font maker there at [URL](http://rinkydinkelectronics.com/t_make_font_file_mono.php) 
 
@@ -157,4 +157,5 @@ See example file "BITMAP" for more details.
 
 ## Screenshots
 
-TODO - WIP.
+![ ss ](https://github.com/gavinlyonsrepo/SSD1306_OLED_PICO/blob/main/extra/image/3.jpg)
+

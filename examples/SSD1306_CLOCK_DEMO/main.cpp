@@ -94,8 +94,8 @@ void DisplayClock(void)
 		myOLED.drawLine(0,35,128,35,WHITE);
 		myOLED.drawLine(0,63,128,63,WHITE);
 
-		myOLED.drawLine(0,10,0,63,WHITE);
-		myOLED.drawLine(127,10,127,63,WHITE);
+		myOLED.drawLine(0,35,0,63,WHITE);
+		myOLED.drawLine(127,35,127,63,WHITE);
 
 		myOLED.drawLine(40,35,40,63,WHITE);
 		myOLED.drawLine(75,35,75,63,WHITE);
@@ -120,14 +120,13 @@ void DisplayClock(void)
 					}
 				}
 			}
-			myOLED.setFont(pFontWide);
+			myOLED.setFont(pFontHallfetica );
 			snprintf(strTime, sizeof(strTime), "%02u:%02u:%02u", Hour , Min , Sec);
-			myOLED.writeCharString(8,16, strTime);
+			myOLED.writeCharString(0,16, strTime);
 			myOLED.setCursor(55,44);
 			myOLED.setFont(pFontDefault);
 			myOLED.print(count);
 			myOLED.OLEDBitmap(80, 40, 16, 8,  MsgIcon, false); 
-			myOLED.OLEDBitmap(100, 40, 16, 8, MsgIcon, true);
 			myOLED.OLEDupdate();
 			myOLED.OLEDclearBuffer();
 		} //sec
