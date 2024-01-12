@@ -1,5 +1,5 @@
 # Set minimum required version of CMake
-cmake_minimum_required(VERSION 3.12)
+cmake_minimum_required(VERSION 3.18)
 
 # Include build functions from Pico SDK
 include($ENV{PICO_SDK_PATH}/external/pico_sdk_import.cmake)
@@ -9,11 +9,11 @@ project(ssd1306 C CXX ASM)
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 20)
 
-# turn on all compiler warnings 
-add_compile_options(-Wall)
-
 # Creates a pico-sdk subdirectory in our project for the libraries
 pico_sdk_init()
+
+# turn on all compiler warnings 
+add_compile_options(-Wall)
 
 # Tell CMake where to find the executable source file
 add_executable(${PROJECT_NAME} 
@@ -25,6 +25,7 @@ add_executable(${PROJECT_NAME}
   #examples/SSD1306_BITMAP/main.cpp
   #examples/SSD1306_CLOCK_DEMO/main.cpp
   #examples/SSD1306_SPEED_TEST/main.cpp
+  #examples/SSD1306_I2C_TEST/main.cpp
 )
 
 # Create map/bin/hex/uf2 files

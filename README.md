@@ -23,7 +23,7 @@
 0. Library to support the I2C  OLED Display Module
    driven by the SSD1306 controller for the Raspberry PI PICO rp2040
 1. Invert color, rotate, sleep, scroll and contrast control.
-2. 10 fonts included.
+2. 10 fonts included, fonts can easily be added or removed.
 3. Graphics class included.
 4. Bitmaps supported.
 5. Can support both I2C ports. IC20 or IC21 selected by user.
@@ -36,14 +36,13 @@
 	1. Raspberry pi PICO RP2040
 	2. SDK(1.4.0) C++20
 	3. compiler G++ for arm-none-eabi((15:10.3-2021.07-4) 
-	4. CMAKE(VERSION 3.12) , VScode(1.84.2)
+	4. CMAKE(VERSION 3.18) , VScode(1.84.2)
 	5. Linux Mint 21.2
 	
 ## Test
 
-There are 8 example files included. User picks the one they want 
-by editing the CMakeLists.txt :: add_executable(${PROJECT_NAME}  section.
-There are 8 paths , comment in one path and one path only.
+There are 9 example files included. User picks the one they want 
+by editing the CMakeLists.txt :: add_executable(${PROJECT_NAME}  section. Comment in one path and one path only.
 
 | Filename | File Function | Screen Size |
 | ---- | ---- | ---- | 
@@ -55,6 +54,7 @@ There are 8 paths , comment in one path and one path only.
 | SPEED_TEST | Frame rate per second test | 128x64 |
 | TEXT |Tests Text & fonts  | 128x64 |
 | GRAPHICS | Tests graphics  | 128x64 |
+| I2C_TEST | I2C interface testing  | 128x64 |
 
 ## Software
 
@@ -106,19 +106,27 @@ Font data table:
 | 9 | pFontGroTesk | 16x32 | 0x20 - 0x7A |  5828 |
 | 10 | pFontSixteenSeg | 32x48 | 0x2D-0x3A , 0-10  :  .  / - only | 2692 |
 
-Font size in bytes = ((X * (Y/8)) * numberOfCharacters) + ControlBytes
+Font size in bytes = ((X * (Y/8)) * numberOfCharacters) + (4*ControlByte)
+
+| Font class Function | Notes |
+| ------ | ------ | 
+| writeChar| draws single character |
+| writeCharString | draws character array |
+| print | Polymorphic print class which will print out many data types |
+
+These methods return an error code in event of an error such as, ASCII character outside chosen fonts range, character out of screen bounds and invalid character array pointer object.
 
 **Remove a font**
 
 To remove an unwanted font from project simply comment out or delete.
 
-1. The Font data in  SSD1306_OLED_font.cpp file
+1. The Font data in SSD1306_OLED_font.cpp file
 2. The pointer to font at bottom of SSD1306_OLED_font.cpp file
 3. The associated extern pointer declaration in the SSD1306_OLED_font.hpp file
 
 **Adding a new font**
 
-1. Add the Font data in  SSD1306_OLED_font.cpp file
+1. Add the Font data in SSD1306_OLED_font.cpp file
 2. Add a pointer to font at bottom of SSD1306_OLED_font.cpp file
 3. Add an associated extern pointer declaration in the SSD1306_OLED_font.hpp file
 
@@ -126,12 +134,14 @@ The new ASCII font must have following font structure.
 First 4 bytes are control bytes followed by vertically addressed font data.
 
 ```
-// An 8 by 8 character size font starting at 
-// ASCII offset 0x20 in ASCII table with 0x5F characters in font. 
-static const uint8_t FontExample[] =
+// An 4 by 8 character size font starting at 
+// ASCII offset 0x30 in ASCII table with 0x02 characters in font. 
+// 0 and 1 
+static const uint8_t FontBinaryExample[] =
 {
-0x08, 0x08, 0x20, 0x5f,   // x-size, y-size, offset, total characters
-(data)
+0x04, 0x08, 0x30, 0x02,   // x-size, y-size, offset, total characters
+(data),(data),(data),(data) // font data '0'
+(data),(data),(data),(data) // font data '1'
 }
 ```
 
@@ -145,15 +155,10 @@ There is a monochrome font maker there at [URL](http://rinkydinkelectronics.com/
 
 ### Bitmaps
 
-Two different bitmaps methods can be used.
-
-| num | Method name | data addressing | Notes | 
-| ------ | ------ | ------ | ------ |   
-| 1 | OLEDBitmap() |horizontal| Draws bitmaps to the buffer | 
-| 2 | OLEDBuffer() |vertical | Write a full screen bitmap direct to screen, used internally| 
+OLEDBitmap function will return an error if : The Bitmap is completely off screen , Invalid Bitmap pointer object, bitmap bigger than screen , bitmap bigger/smaller than provided width and height calculation ( This helps prevents buffer overflow). A horizontal addressed Bitmap's width MUST be divisible by 8. eg, for a bitmap with width=88 and height=48. Bitmap excepted size = (88/8) * 48 = 528 bytes.
 
 Bitmaps can be turned to data [here at link]( https://javl.github.io/image2cpp/) 
-See example file "BITMAP" for more details.
+See example file "_BITMAP" for more details.
 
 ## Screenshots
 

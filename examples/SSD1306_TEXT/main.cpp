@@ -24,19 +24,26 @@
 */
 
 // === Libraries ===
-#include <stdio.h>
+#include <cstdio>
 #include "pico/stdlib.h"
 #include "ssd1306/SSD1306_OLED.hpp"
 
-// Test reset delay
+// Test timing parameters
 #define DisplayDelay4 4000
 #define DisplayDelay2 2000
 
+// Screen settings
 #define myOLEDwidth  128
 #define myOLEDheight 64
-const uint16_t I2C_Speed = 100; 
+#define myScreenSize (myOLEDwidth * (myOLEDheight/8)) // eg 1024 bytes = 128 * 64/8
+uint8_t screenBuffer[myScreenSize]; // Define a buffer to cover whole screen  128 * 64/8
+
+// I2C settings
+const uint16_t I2C_Speed = 100;
 const uint8_t I2C_Address = 0x3C;
-SSD1306 myOLED(myOLEDwidth ,myOLEDheight) ; // instantiate  an object 
+
+// instantiate  an OLED object
+SSD1306 myOLED(myOLEDwidth ,myOLEDheight);
 
 // =============== Function prototype ================
 void SetupTest(void);
@@ -64,12 +71,7 @@ void TestReset(void);
 int main() 
 {
 	SetupTest();
-
-	// Define a buffer to cover whole screen 
-	uint8_t  screenBuffer[myOLEDwidth * (myOLEDheight/8)+1]; 
- 	myOLED.buffer = (uint8_t*) &screenBuffer;  // set that to library buffer pointer
 	myOLED.OLEDclearBuffer();
-
 	Test701();
 	Test702();
 	Test703();
@@ -86,7 +88,7 @@ int main()
 	Test713();
 	Test714();
 	Test715();
-
+	
 	EndTest();
 }
 // ======================= End of main  ===================
@@ -96,16 +98,20 @@ void SetupTest()
 {
 	stdio_init_all(); // Initialize chosen serial port, default 38400 baud
 	busy_wait_ms(500);
-	while(myOLED.OLEDbegin(I2C_Address,i2c1, I2C_Speed, 18, 19) != true)
+	printf("OLED SSD1306 :: Start!\r\n");
+	while(myOLED.OLEDbegin(I2C_Address,i2c1,  I2C_Speed, 18, 19) != true)
 	{
-		printf("OLED SSD1306 :: Failed to initialize OLED.!\r\n");
+		printf("SetupTest ERROR : Failed to initialize OLED!\r\n");
 		busy_wait_ms(1500);
 	} // initialize the OLED
-	printf("OLED SSD1306 :: Start!\r\n");
+	if (myOLED.OLEDSetBufferPtr(myOLEDwidth, myOLEDheight, screenBuffer, sizeof(screenBuffer)/sizeof(uint8_t)) != 0)
+	{
+		printf("SetupTest : ERROR : OLEDSetBufferPtr Failed!\r\n");
+		while(1){busy_wait_ms(1000);}
+	} // Initialize the buffer
 	myOLED.OLEDFillScreen(0xF0, 0); // splash screen bars
 	busy_wait_ms(1000);
 }
-
 
 void Test701(void)
 {
@@ -270,7 +276,7 @@ void Test710(void)
 
 void Test711() 
 {
-	printf("OLED Test 711-a print ASCII  font 0-127 \r\n");
+	printf("OLED Test 711-a print ASCII font 0-127 \r\n");
 	myOLED.setFont(pFontDefault);
 	myOLED.setInvertFont(false);
 	myOLED.setCursor(0, 0);
@@ -292,17 +298,17 @@ void Test711()
 	uint8_t y = 15;
 	myOLED.setCursor(x, y);
 	
-	// Test 706
+	// Test 711-b
 	printf("OLED Test 711-b print ASCII font 128-255 \r\n");
-	for (uint8_t i = 128; i < 255; i++)
+	for (uint8_t i = 128; i < 254; i++)
 	{
-		if (x > 180)
+		if (x > 110)
 		{
 			x = 0;
-			y += 9;
+			y += 8;
 		}
 		myOLED.writeChar(x, y , i);
-		x += 7;
+		x += 6;
 	}
 	TestReset();
 }

@@ -18,14 +18,23 @@ SSD1306_OLEDFonts::SSD1306_OLEDFonts(){};
 /*!
 	@brief SSD1306_SetFont
 	@param  SelectedFontName Select this font, pass the font pointer name 
+	@return	Will return
+		-# 0. Success
+		-# 2. Not a valid pointer object.
  */
-void SSD1306_OLEDFonts::setFont(const uint8_t * SelectedFontName) {
+uint8_t SSD1306_OLEDFonts::setFont(const uint8_t * SelectedFontName) {
+	if (SelectedFontName == nullptr)
+	{
+		printf("SSD1306_OLEDFonts::setFont ERROR 2: Invalid pointer object\r\n");
+		return 2;
+	}
 	_FontSelect   = SelectedFontName;
 	_Font_X_Size  = *(SelectedFontName + 0);
 	_Font_Y_Size  = *(SelectedFontName + 1);
 	_FontOffset   = *(SelectedFontName + 2);
 	_FontNumChars = *(SelectedFontName + 3);
 	_FontInverted = false;
+	return 0;
 }
 
 /*!
@@ -66,8 +75,12 @@ SSD1306_graphics::SSD1306_graphics(int16_t w, int16_t h):
 	@param  x character starting position on x-axis. Valid values: 0..127
 	@param  y character starting position on x-axis. Valid values: 0..63
 	@param  value Character to be written.
+	@return Will return
+		-# 0 success
+		-# 2 co-ords out of bounds check x and y
+		-# 3 Character out of ASCII Font bounds, check Font range
  */
-void SSD1306_graphics::writeChar(int16_t x, int16_t y, char value) {
+uint8_t SSD1306_graphics::writeChar(int16_t x, int16_t y, char value) {
 	uint16_t fontIndex = 0;
 	uint16_t rowCount = 0;
 	uint16_t count = 0;
@@ -76,6 +89,21 @@ void SSD1306_graphics::writeChar(int16_t x, int16_t y, char value) {
 	int16_t colByte, cx, cy;
 	int16_t colbit;
 	
+	// 1. Check for screen out of  bounds
+	if((x >= _width)            || // Clip right
+	(y >= _height)           || // Clip bottom
+	((x + _Font_X_Size+1) < 0) || // Clip left
+	((y + _Font_Y_Size) < 0))   // Clip top
+	{
+		printf("SSD1306_graphics::writeChar Error 2: Co-ordinates out of bounds \r\n");
+		return 2;
+	}
+	// 2. Check for character out of font range bounds
+	if ( value < _FontOffset || value >= (_FontOffset + _FontNumChars + 1))
+	{
+		printf("SSD1306_graphics::writeChar Error 3: Character out of Font bounds  %u : %u<->%u \r\n", value  ,_FontOffset, _FontOffset + _FontNumChars + 1);
+		return 3;
+	}
 	if (_Font_Y_Size % 8 == 0) // Is the font height divisible by 8
 	{
 		fontIndex = ((value - _FontOffset)*(_Font_X_Size * (_Font_Y_Size/ 8))) + 4;
@@ -117,18 +145,29 @@ void SSD1306_graphics::writeChar(int16_t x, int16_t y, char value) {
 			}
 		}
 	}
-	
+	return 0;
 }
 
 /*!
-	@brief Write Text charactor array on OLED.
+	@brief Write Text character array on OLED.
 	@param  x character starting position on x-axis.
 	@param  y character starting position on y-axis.
-	@param  text Pointer to the array of the text to be written.
+	@param  pText Pointer to the array of the text to be written.
+	@return Will return
+		-# 0 Success
+		-# 2 String pText Array invalid pointer object
+		-# 3 Failure in writeChar method upstream
  */
-void SSD1306_graphics::writeCharString(int16_t x, int16_t y, char * text) {
+uint8_t SSD1306_graphics::writeCharString(int16_t x, int16_t y, char * pText) {
 	uint8_t count=0;
-	while(*text != '\0') 
+	uint8_t MaxLength=0;
+	// Check for null pointer
+	if(pText == nullptr)
+	{
+		print("SSD1306_graphics::writeCharString Error 2 :String array is not valid pointer\n");
+		return 2;
+	}
+	while(*pText != '\0')
 	{
 		// check if text has reached end of screen
 		if ((x + (count * _Font_X_Size)) > _width - _Font_X_Size)
@@ -136,14 +175,21 @@ void SSD1306_graphics::writeCharString(int16_t x, int16_t y, char * text) {
 			y = y + _Font_Y_Size;
 			count = 0;
 		}
-		writeChar(x + (count * (_Font_X_Size)), y, *text++);
+		if(writeChar(x + (count * (_Font_X_Size)), y, *pText++) != 0)
+			return 3;
 		count++;
+		MaxLength++;
+		if (MaxLength >= 150) break; // 2nd way out of loop, safety check
 	}
+	return 0;
 }
 
 /*! 
 	@brief write method used in the print class when user calls print
 	@param character the character to print
+	@return Will return
+		-# 1. success
+		-# -1. An error in the writeChar method.
 */
 size_t SSD1306_graphics::write(uint8_t character) 
 {
@@ -155,7 +201,7 @@ size_t SSD1306_graphics::write(uint8_t character)
 		break;
 		case '\r': break;
 		default:
-			writeChar(_cursor_x, _cursor_y, character);
+			if(writeChar(_cursor_x, _cursor_y, character) != 0 ) return -1;
 			_cursor_x += (_Font_X_Size);
 			if (_textwrap && (_cursor_x  > (_width - (_Font_X_Size)))) 
 			{

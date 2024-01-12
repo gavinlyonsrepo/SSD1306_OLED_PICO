@@ -17,12 +17,18 @@
 #include "ssd1306/SSD1306_OLED.hpp"
 #include "ssd1306/Bitmap_test_data.hpp"
 
+// Screen settings
 #define myOLEDwidth  128
 #define myOLEDheight 64
-uint8_t fullscreenBuffer[1024]; // 128 * 64/8
+#define myScreenSize (myOLEDwidth * (myOLEDheight/8)) // eg 1024 bytes = 128 * 64/8
+uint8_t screenBuffer[myScreenSize]; // Define a buffer to cover whole screen  128 * 64/8
+
+// I2C settings
 const uint16_t I2C_Speed = 100;
 const uint8_t I2C_Address = 0x3C;
-SSD1306 myOLED(myOLEDwidth ,myOLEDheight) ; // instantiate  an object
+
+// instantiate  an OLED object
+SSD1306 myOLED(myOLEDwidth ,myOLEDheight);
 
 // =============== Function prototype ================
 void SetupTest(void);
@@ -45,13 +51,18 @@ int main()
 void SetupTest() 
 {
 	stdio_init_all(); // Initialize chosen serial port, default 38400 baud
-	busy_wait_ms(100);
+	busy_wait_ms(500);
 	printf("OLED SSD1306 :: Start!\r\n");
 	while(myOLED.OLEDbegin(I2C_Address,i2c1,  I2C_Speed, 18, 19) != true)
 	{
-		printf("OLED SSD1306 :: Failed to initialize OLED.!\r\n");
+		printf("SetupTest ERROR : Failed to initialize OLED!\r\n");
 		busy_wait_ms(1500);
 	} // initialize the OLED
+	if (myOLED.OLEDSetBufferPtr(myOLEDwidth, myOLEDheight, screenBuffer, sizeof(screenBuffer)/sizeof(uint8_t)) != 0)
+	{
+		printf("SetupTest : ERROR : OLEDSetBufferPtr Failed!\r\n");
+		while(1){busy_wait_ms(1000);}
+	} // Initialize the buffer
 	myOLED.OLEDFillScreen(0xF0, 0); // splash screen bars
 	busy_wait_ms(1000);
 }
@@ -85,10 +96,10 @@ void DisplayClock(void)
 		
 	while (count < 30)
 	{
-		myOLED.OLEDBitmap(0, 0, 16, 8,  SignalIcon, false);
-		myOLED.OLEDBitmap(20, 0, 16, 8,  MsgIcon, false);
-		myOLED.OLEDBitmap(37, 0, 8, 8,  AlarmIcon, false);
-		myOLED.OLEDBitmap(110, 0, 16, 8,  BatIcon, false);
+		myOLED.OLEDBitmap(0, 0, 16, 8,  SignalIcon, false, sizeof(SignalIcon)/sizeof(uint8_t));
+		myOLED.OLEDBitmap(20, 0, 16, 8,  MsgIcon, false, sizeof(MsgIcon)/sizeof(uint8_t));
+		myOLED.OLEDBitmap(37, 0, 8, 8,  AlarmIcon, false, sizeof(AlarmIcon)/sizeof(uint8_t));
+		myOLED.OLEDBitmap(110, 0, 16, 8,  BatIcon, false, sizeof(BatIcon)/sizeof(uint8_t));
 
 		myOLED.drawLine(0,10,128,10,WHITE);
 		myOLED.drawLine(0,35,128,35,WHITE);
@@ -126,7 +137,7 @@ void DisplayClock(void)
 			myOLED.setCursor(55,44);
 			myOLED.setFont(pFontDefault);
 			myOLED.print(count);
-			myOLED.OLEDBitmap(80, 40, 16, 8,  MsgIcon, false); 
+			myOLED.OLEDBitmap(80, 40, 16, 8,  MsgIcon, false,sizeof(MsgIcon)/sizeof(uint8_t)); 
 			myOLED.OLEDupdate();
 			myOLED.OLEDclearBuffer();
 		} //sec
@@ -139,8 +150,12 @@ void DisplayClock(void)
 
 void SplashScreen(void)
 {
-	myOLED.buffer = (uint8_t*) &fullscreenBuffer;
-	myOLED.OLEDBitmap(0, 0, myOLEDwidth, myOLEDheight, fullscreenBitmap, true);
+	if (myOLED.OLEDSetBufferPtr(myOLEDwidth, myOLEDheight, screenBuffer, sizeof(screenBuffer)/sizeof(uint8_t)) != 0)
+	{
+		printf("Test: ERROR : OLEDSetBufferPtr Failed!\r\n");
+		while(1){busy_wait_ms(1000);}
+	}
+	myOLED.OLEDBitmap(0, 0, myOLEDwidth, myOLEDheight, fullscreenBitmap, true, sizeof(fullscreenBitmap)/sizeof(uint8_t));
 	myOLED.OLEDupdate();
 	busy_wait_ms(5000);
 	myOLED.OLEDFillScreen(0x00, 0);

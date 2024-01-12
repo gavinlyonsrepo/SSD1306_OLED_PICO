@@ -9,8 +9,8 @@
 
 #pragma once
 
-#include <stdio.h>
-#include <stdint.h>
+#include <cstdio>
+#include <cstdint>
 #include <cmath> // for "abs"
 #include "ssd1306/SSD1306_OLED_font.hpp"
 #include "ssd1306/SSD1306_OLED_Print.hpp"
@@ -25,11 +25,11 @@ class SSD1306_OLEDFonts
 		SSD1306_OLEDFonts();
 		~SSD1306_OLEDFonts(){};
 
-		void setFont(const uint8_t * font);
+		uint8_t setFont(const uint8_t * font);
 		void setInvertFont(bool invertStatus);
 		bool getInvertFont(void);
 
-		const uint8_t *_FontSelect = nullptr; /**< Pointer to the active font,  Fonts Stored are Const */
+		const uint8_t *_FontSelect = pFontDefault; /**< Pointer to the active font,  Fonts Stored are Const */
 	
 	protected:
 		uint8_t _Font_X_Size = 0x06; /**< Width Size of a Font character */
@@ -75,8 +75,8 @@ class SSD1306_graphics : public SSD1306_OLEDFonts , public Print
 
 	// Text related functions 
 	virtual size_t write(uint8_t);
-	void writeChar( int16_t x, int16_t y, char value );
-	void writeCharString( int16_t x, int16_t y, char *text);
+	uint8_t writeChar( int16_t x, int16_t y, char value );
+	uint8_t writeCharString( int16_t x, int16_t y, char *text);
 	void setTextWrap(bool w);
 
 	int16_t height(void) const;

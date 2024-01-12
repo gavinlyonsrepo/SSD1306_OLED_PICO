@@ -10,19 +10,26 @@
 */
 
 // === Libraries ===
-#include <stdio.h>
+#include <cstdio>
 #include "pico/stdlib.h"
 #include "ssd1306/SSD1306_OLED.hpp"
 
+// Screen settings
 #define myOLEDwidth  128
 #define myOLEDheight 64
+#define myScreenSize (myOLEDwidth * (myOLEDheight/8)) // eg 1024 bytes = 128 * 64/8
+uint8_t screenBuffer[myScreenSize]; // Define a buffer to cover whole screen  128 * 64/8
 
+// I2C settings
+const uint16_t I2C_Speed = 100;
+const uint8_t I2C_Address = 0x3C;
+
+// instantiate  an OLED object
+SSD1306 myOLED(myOLEDwidth ,myOLEDheight);
+
+// test timing parameters
 #define DisplayDelay1 4000
 #define DisplayDelay2 0
-
-const uint16_t I2C_Speed = 100; 
-const uint8_t I2C_Address = 0x3C;
-SSD1306 myOLED(myOLEDwidth ,myOLEDheight) ; // instantiate  an object
 
 // =============== Function prototype ================
 void SetupTest(void);
@@ -43,13 +50,18 @@ int main(int argc, char **argv)
 void SetupTest() 
 {
 	stdio_init_all(); // Initialize chosen serial port, default 38400 baud
-	busy_wait_ms(50);
+	busy_wait_ms(500);
 	printf("OLED SSD1306 :: Start!\r\n");
 	while(myOLED.OLEDbegin(I2C_Address,i2c1,  I2C_Speed, 18, 19) != true)
 	{
-		printf("OLED SSD1306 :: Failed to initialize OLED.!\r\n");
+		printf("SetupTest ERROR : Failed to initialize OLED!\r\n");
 		busy_wait_ms(1500);
 	} // initialize the OLED
+	if (myOLED.OLEDSetBufferPtr(myOLEDwidth, myOLEDheight, screenBuffer, sizeof(screenBuffer)/sizeof(uint8_t)) != 0)
+	{
+		printf("SetupTest : ERROR : OLEDSetBufferPtr Failed!\r\n");
+		while(1){busy_wait_ms(1000);}
+	} // Initialize the buffer
 	myOLED.OLEDFillScreen(0xF0, 0); // splash screen bars
 	busy_wait_ms(1000);
 }
@@ -67,9 +79,7 @@ void  DisplayGraphics()
 	//Q1 ||  Q2
 	//---------
 	//Q3 ||  Q4
-	// Define a full screen buffer
-	uint8_t  screenBuffer[(myOLEDwidth * (myOLEDheight / 8)) + 1];
-	myOLED.buffer = (uint8_t*) &screenBuffer;  
+
 	myOLED.OLEDclearBuffer(); // Clear the buffer
 	
 	printf("OLED Test 901 graphics test \r\n");

@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include <stdint.h>
+#include <cstdint>
 
 // Font data is in the cpp file accessed thru extern pointers.
 extern const uint8_t * pFontDefault;

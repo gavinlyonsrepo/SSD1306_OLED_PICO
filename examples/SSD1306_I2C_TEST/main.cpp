@@ -1,13 +1,11 @@
 /*!
 	@file main.cpp
 	@author Gavin Lyons
-	@brief Test file for SSD1306_OLED library, showing  "hello world" basic use case
-	for a 128X32 size screen
-	
+	@brief Test file for SSD1306_OLED library, showing I2C test
 	Project Name: SSD1306_OLED_PICO
 
 	@test
-		1. Test 102 Hello World 128X32 screen
+		1. Test 000 I2C interface testing
 */
 
 // === Libraries ===
@@ -17,9 +15,9 @@
 
 // Screen settings
 #define myOLEDwidth  128
-#define myOLEDheight 32
-#define myScreenSize (myOLEDwidth * (myOLEDheight/8)) // eg 512 bytes = 128 * 32/8
-uint8_t screenBuffer[myScreenSize]; // Define a buffer to cover whole screen  128 * 32/8
+#define myOLEDheight 64
+#define myScreenSize (myOLEDwidth * (myOLEDheight/8)) // eg 1024 bytes = 128 * 64/8
+uint8_t screenBuffer[myScreenSize]; // Define a buffer to cover whole screen  128 * 64/8
 
 // I2C settings
 const uint16_t I2C_Speed = 100;
@@ -64,12 +62,30 @@ void SetupTest()
 
 void Test() 
 {
-	myOLED.OLEDclearBuffer(); 
-	myOLED.setFont(pFontGroTesk); 
-	myOLED.setCursor(0, 0);
-	myOLED.print("HELLO WD");
-	myOLED.OLEDupdate();  
-	busy_wait_ms(7000);
+	uint8_t testCount = 0;
+	int16_t returnValueConnection = 0;
+	myOLED.SetDebugMode(true);
+	while(testCount++ < 100)
+	{
+		myOLED.OLEDclearBuffer(); 
+		myOLED.setFont(pFontDefault);
+		myOLED.setCursor(5,5);
+		myOLED.print("I2C test!");
+		myOLED.setCursor(5,25);
+		myOLED.print(testCount);
+		myOLED.OLEDupdate();  
+		busy_wait_ms(1000);
+		printf("Library number %u \n",myOLED.GetLibVerNum()); 
+		printf("Debug Mode %u \n",myOLED.GetDebugMode()); 
+		printf("I2C retry attempts %u \n",myOLED.GetI2CRetryAttemptsNo());
+		printf("I2C retry Delay %u mS\n",myOLED.GetI2CRetryDelay());
+		printf("I2C Timeout %lu uS\n",myOLED.GetI2CTimeout());
+		printf("I2C Is connected %u\n", myOLED.GetIsConnected());
+		returnValueConnection = myOLED.CheckConnection();
+		if (returnValueConnection >= 1)
+			printf("Connected : %i \r\n ", returnValueConnection);
+		else
+			printf("Not Connected : %i \r\n", returnValueConnection);	}
 }
 
 void EndTest()
