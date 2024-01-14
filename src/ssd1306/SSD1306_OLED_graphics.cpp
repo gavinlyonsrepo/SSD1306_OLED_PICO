@@ -173,6 +173,7 @@ uint8_t SSD1306_graphics::writeCharString(int16_t x, int16_t y, char * pText) {
 		if ((x + (count * _Font_X_Size)) > _width - _Font_X_Size)
 		{
 			y = y + _Font_Y_Size;
+			x = 0;
 			count = 0;
 		}
 		if(writeChar(x + (count * (_Font_X_Size)), y, *pText++) != 0)
