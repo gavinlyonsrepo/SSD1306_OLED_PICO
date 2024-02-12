@@ -12,7 +12,6 @@
 #include <cstdio> // optional for printf debug messages
 #include <cstdint>
 #include <cstdbool>
-//#include <cstring.h>
 #include "ssd1306/SSD1306_OLED_graphics.hpp"
 #include "hardware/i2c.h"
 
@@ -145,13 +144,11 @@ class SSD1306 : public SSD1306_graphics  {
 	bool _bSerialDebugFlag = false; /**< for serial debug I2C errors to console flag */
 	
 	// Screen related 
-	int16_t _OLED_WIDTH = 128;     /**< Width of OLED Screen in pixels */
-	int16_t _OLED_HEIGHT = 64;    /**< Height of OLED Screen in pixels */
-	int8_t _OLED_PAGE_NUM = 8;   /**< Number of byte size pages OLED screen is divided into */ 
-	uint8_t _bufferWidth = 128 ;    /**< Width of Screen Buffer */ 
-	uint8_t _bufferHeight = 64 ;   /**< Height of Screen Buffer */
+	uint8_t _OLED_WIDTH=128;      /**< Width of OLED Screen in pixels */
+	uint8_t _OLED_HEIGHT=64;    /**< Height of OLED Screen in pixels */
+	uint8_t _OLED_PAGE_NUM=(_OLED_HEIGHT/8); /**< Number of byte size pages OLED screen is divided into */
 	uint8_t* _OLEDbuffer = nullptr;  /**< Buffer to hold screen data */
 
-	const uint16_t _OLEDLibVerNum = 101; /**< Library version number 101 = 1.0.1*/
+	const uint16_t _OLEDLibVerNum = 102; /**< Library version number 102 = 1.0.2*/
 
 }; 

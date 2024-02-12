@@ -13,7 +13,7 @@ set(CMAKE_CXX_STANDARD 20)
 pico_sdk_init()
 
 # turn on all compiler warnings 
-add_compile_options(-Wall)
+add_compile_options(-Wall -Wextra)
 
 # Tell CMake where to find the executable source file
 add_executable(${PROJECT_NAME} 

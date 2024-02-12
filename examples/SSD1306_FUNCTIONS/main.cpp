@@ -140,40 +140,47 @@ void myTests()
  	
  	// ** Test 505 rotate test **
  	
- 	myOLED.OLEDclearBuffer();
- 	printf("OLED rotate test 505\r\n");
-	myOLED.setRotation(1);
+	myOLED.OLEDclearBuffer();
+	printf("OLED Rotate test 505\r\n");
+	myOLED.setRotation(displayBC_Degrees_90);
 	myOLED.OLEDclearBuffer();
 	myOLED.setCursor(5,5 );
-	myOLED.print(" rotate 1");
+	myOLED.print("rotate 90");
+	myOLED.setCursor(5,110);
+	myOLED.print("bottom");
 	myOLED.OLEDupdate();
 	busy_wait_ms(3000);
-	
-	myOLED.setRotation(2);
+
+	myOLED.setRotation(displayBC_Degrees_180);
 	myOLED.OLEDclearBuffer();
 	myOLED.setCursor(5,5 );
-	myOLED.print("rotate 2");
+	myOLED.print("rotate 180");
+	myOLED.setCursor(5,50);
+	myOLED.print("bottom");
 	myOLED.OLEDupdate();
 	busy_wait_ms(3000);
-	
-	
-	myOLED.setRotation(3);
+
+	myOLED.setRotation(displayBC_Degrees_270);
 	myOLED.OLEDclearBuffer();
 	myOLED.setCursor(5,5 );
-	myOLED.print("rotate 3");
+	myOLED.print("rotate   270");
+	myOLED.setCursor(5,110);
+	myOLED.print("bottom");
 	myOLED.OLEDupdate();
 	busy_wait_ms(3000);
-	
-	myOLED.setRotation(0); //default normal 
+
+	myOLED.setRotation(displayBC_Degrees_0); //default normal
 	myOLED.OLEDclearBuffer();
 	myOLED.setCursor(5,5 );
 	myOLED.print("rotate 0");
 	myOLED.OLEDupdate();
 	busy_wait_ms(3000);
 	
+	myOLED.OLEDFillScreen(0xF0, 0); // Clear the screen
+	
 	// ** end of tests **
 	myOLED.OLEDclearBuffer();
-	myOLED.setCursor(5, 5);
+	myOLED.setCursor(15, 25);
 	myOLED.print("End of tests");
 	myOLED.OLEDupdate();
 	busy_wait_ms(3000);

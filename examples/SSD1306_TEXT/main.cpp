@@ -67,6 +67,7 @@ void Test715(void);
 
 void EndTest(void);
 void TestReset(void);
+void testErrorCheck(void);
 // ======================= Main ===================
 int main() 
 {
@@ -88,7 +89,7 @@ int main()
 	Test713();
 	Test714();
 	Test715();
-	
+	testErrorCheck();
 	EndTest();
 }
 // ======================= End of main  ===================
@@ -334,13 +335,13 @@ void Test713(void)
 	myOLED.setCursor(0, 0);
 	myOLED.println("first line");
 	myOLED.print("2nd Line");
-	myOLED.setCursor(0, 32);
+	myOLED.setCursor(40, 32);
 	myOLED.setFont(pFontWide);
 	myOLED.print("123456789ABCDEFGHIJ");
 	TestReset();
 	printf("OLED Test 713-b writeText new line \r\n");
 	char TestStr1[] = "123456789ABCDEFGHIJ";
-	myOLED.writeCharString(0,0, TestStr1);
+	myOLED.writeCharString(40,0, TestStr1);
 	TestReset();
 }
 
@@ -387,4 +388,35 @@ void EndTest()
 	printf("OLED SSD1306 :: End\r\n");
 }
 
+void testErrorCheck(void)
+{
+	// Error checking
+	printf("==== Test 720 Start Error checking ====\r\n");
+	printf("Result = 3 3 3 2 2 2 2 ===\r\n");
+	char testlowercase[] = "ZA[ab";
+	char testNonNumExtend[] = "-:;A";
+
+	// character out of font bounds
+	// wide & thick lower case + ]
+	myOLED.setFont(pFontWide);
+	myOLED.writeCharString(5,  5, testlowercase); //throw wide font error 2
+	myOLED.writeChar(32, 0, '!');
+	TestReset();
+	// Numeric extended bounds ; , A errors
+	myOLED.setFont(pFontSixteenSeg);
+	myOLED.writeCharString(0, 0, testNonNumExtend); //throw font error 2
+	myOLED.writeChar(32, 0, ','); //throw error 2
+	TestReset();
+	printf("========\r\n");
+	// screen out of bounds
+	myOLED.setFont(pFontDefault);
+	myOLED.writeChar(0, 100, 'e'); //throw error 1
+	myOLED.writeChar(150, 0, 'f'); //throw error 1
+	TestReset();
+	myOLED.setFont(pFontArialBold);
+	myOLED.writeChar(0, 100, 'A'); //throw error 1
+	myOLED.writeChar(150, 0, 'B'); //throw error 1
+	TestReset();
+	printf("==== Stop Error checking ====\r\n");
+}
 // ============== EOF =========

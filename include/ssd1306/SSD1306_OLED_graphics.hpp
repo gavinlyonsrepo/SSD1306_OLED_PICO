@@ -17,6 +17,15 @@
 
 #define swapOLEDPICO(a, b) { int16_t t = a; a = b; b = t; }
 
+/*! Enum to hold current screen rotation in degrees bi color display  */
+enum displayBC_rotate_e : uint8_t
+{
+	displayBC_Degrees_0 =   0,    /**< display screen rotated 0 degrees */
+	displayBC_Degrees_90 =  1,    /**< display screen rotated 90 degrees  */
+	displayBC_Degrees_180 = 2,    /**< display screen rotated 180 degrees  */
+	displayBC_Degrees_270 = 3     /**< display screen rotated 270 degrees */
+};
+
 /*! @brief Font class to hold font data object  */
 class SSD1306_OLEDFonts
 {
@@ -81,19 +90,18 @@ class SSD1306_graphics : public SSD1306_OLEDFonts , public Print
 
 	int16_t height(void) const;
 	int16_t width(void) const;
-	uint8_t getRotation(void) const;
-	void setRotation(uint8_t r);
+	displayBC_rotate_e getRotation(void);
+	void setRotation(displayBC_rotate_e r);
 
  protected:
 	
 	const int16_t WIDTH;  /**< This is the 'raw' display w - never changes */
 	const int16_t HEIGHT;  /**< This is the 'raw' display h - never changes*/
-
+	displayBC_rotate_e  _display_rotate = displayBC_Degrees_0; /**< Enum to hold rotation */
 	int16_t _width;  /**< Display w as modified by current _rotation*/
 	int16_t _height;  /**< Display h as modified by current _rotation*/
 	int16_t _cursor_x = 0; /**< Current X co-ord cursor position */
 	int16_t _cursor_y = 0;  /**< Current Y co-ord cursor position */
-	uint8_t _rotation = 0; /**< Current rotation 0-3 */
 	
 	bool _textwrap = true;  /**< If set, text at right edge of display will wrap, print method*/
 };

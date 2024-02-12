@@ -66,7 +66,6 @@ SSD1306_graphics::SSD1306_graphics(int16_t w, int16_t h):
 	_height   = HEIGHT;
 	_cursor_y  = 0; 
 	_cursor_x  = 0;
-	_rotation = 0;
 	_textwrap  = true;
 }
 
@@ -101,7 +100,7 @@ uint8_t SSD1306_graphics::writeChar(int16_t x, int16_t y, char value) {
 	// 2. Check for character out of font range bounds
 	if ( value < _FontOffset || value >= (_FontOffset + _FontNumChars + 1))
 	{
-		printf("SSD1306_graphics::writeChar Error 3: Character out of Font bounds  %u : %u<->%u \r\n", value  ,_FontOffset, _FontOffset + _FontNumChars + 1);
+		printf("SSD1306_graphics::writeChar Error 3: Character out of Font bounds  %c : %u<->%u \r\n", value  ,_FontOffset, _FontOffset + _FontNumChars);
 		return 3;
 	}
 	if (_Font_Y_Size % 8 == 0) // Is the font height divisible by 8
@@ -625,17 +624,17 @@ int16_t SSD1306_graphics::height(void) const {
 	@brief Gets the _rotation of the display 
 	@return _rotation value 0-3
 */
-uint8_t SSD1306_graphics::getRotation(void) const {
-	return _rotation;
+displayBC_rotate_e SSD1306_graphics::getRotation(void)  {
+	return _display_rotate;;
 }
 
  /*!
 	@brief Sets the _rotation of the display 
 	@param x _rotation value 0-3
 */
-void SSD1306_graphics::setRotation(uint8_t x) {
-	_rotation = (x & 3);
-	switch(_rotation) {
+void SSD1306_graphics::setRotation(displayBC_rotate_e CurrentRotation) {
+	_display_rotate = CurrentRotation;
+	switch(CurrentRotation) {
 	 case 0:
 	 case 2:
 		_width  = WIDTH;
