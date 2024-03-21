@@ -12,7 +12,7 @@
 #include <cstdio> // optional for printf debug messages
 #include <cstdint>
 #include <cstdbool>
-#include "ssd1306/SSD1306_OLED_graphics.hpp"
+#include "SSD1306_OLED_graphics.hpp"
 #include "hardware/i2c.h"
 
 //  SSD1306 Command Set  

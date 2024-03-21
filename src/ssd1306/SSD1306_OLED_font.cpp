@@ -6,7 +6,7 @@
 * @details <https://github.com/gavinlyonsrepo/SSD1306_OLED_PICO>
 */
 
-#include "../include/ssd1306/SSD1306_OLED_font.hpp"
+#include "../../include/ssd1306/SSD1306_OLED_font.hpp"
 
 /*! 
     Standard ASCII 6x8 font 

@@ -7,7 +7,7 @@
 
 //#include <stdio.h> 
 #include "pico/stdlib.h"
-#include "../include/ssd1306/SSD1306_OLED.hpp"
+#include "../../include/ssd1306/SSD1306_OLED.hpp"
 
 /*!
 	@brief init the screen object
