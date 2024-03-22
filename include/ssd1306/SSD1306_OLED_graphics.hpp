@@ -12,8 +12,8 @@
 #include <cstdio>
 #include <cstdint>
 #include <cmath> // for "abs"
-#include "ssd1306/SSD1306_OLED_font.hpp"
-#include "ssd1306/SSD1306_OLED_Print.hpp"
+#include "SSD1306_OLED_font.hpp"
+#include "SSD1306_OLED_Print.hpp"
 
 #define swapOLEDPICO(a, b) { int16_t t = a; a = b; b = t; }
 

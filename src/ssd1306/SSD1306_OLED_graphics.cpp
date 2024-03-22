@@ -5,9 +5,9 @@
 * @details https://github.com/gavinlyonsrepo/SSD1306_OLED_PICO
 */
 
-#include "../include/ssd1306/SSD1306_OLED_graphics.hpp"
-#include "../include/ssd1306/SSD1306_OLED_font.hpp"
-#include "../include/ssd1306/SSD1306_OLED.hpp"
+#include "../../include/ssd1306/SSD1306_OLED_graphics.hpp"
+#include "../../include/ssd1306/SSD1306_OLED_font.hpp"
+#include "../../include/ssd1306/SSD1306_OLED.hpp"
 
 // === Font class implementation ===
 /*!
