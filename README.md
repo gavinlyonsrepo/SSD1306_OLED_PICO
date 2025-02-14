@@ -37,7 +37,7 @@
 	2. SDK(1.4.0) C++20
 	3. compiler G++ for arm-none-eabi((15:10.3-2021.07-4) 
 	4. CMAKE(VERSION 3.18) , VScode(1.84.2)
-	5. Linux Mint 21.2
+	5. Linux Mint 22.1
 	
 ## Test
 
@@ -114,21 +114,21 @@ Font size in bytes = ((X * (Y/8)) * numberOfCharacters) + (4*ControlByte)
 | writeCharString | draws character array |
 | print | Polymorphic print class which will print out many data types |
 
-These methods return an error code in event of an error such as, ASCII character outside chosen fonts range, character out of screen bounds and invalid character array pointer object.
+These methods return an error code in event of an error.
 
 **Remove a font**
 
 To remove an unwanted font from project simply comment out or delete.
 
 1. The Font data in SSD1306_OLED_font.cpp file
-2. The pointer to font at bottom of SSD1306_OLED_font.cpp file
-3. The associated extern pointer declaration in the SSD1306_OLED_font.hpp file
+2. The span to font at middle of SSD1306_OLED_font.cpp file
+3. The associated extern declaration in the SSD1306_OLED_font.hpp file
 
 **Adding a new font**
 
 1. Add the Font data in SSD1306_OLED_font.cpp file
-2. Add a pointer to font at bottom of SSD1306_OLED_font.cpp file
-3. Add an associated extern pointer declaration in the SSD1306_OLED_font.hpp file
+2. Add a span to font at bottom of SSD1306_OLED_font.cpp file
+3. Add an associated extern declaration in the SSD1306_OLED_font.hpp file
 
 The new ASCII font must have following font structure.
 First 4 bytes are control bytes followed by vertically addressed font data.
@@ -137,7 +137,7 @@ First 4 bytes are control bytes followed by vertically addressed font data.
 // An 4 by 8 character size font starting at 
 // ASCII offset 0x30 in ASCII table with 0x02 characters in font. 
 // 0 and 1 
-static const uint8_t FontBinaryExample[] =
+static const std::array<uint8_t, 12>FontBinaryExample[] =
 {
 0x04, 0x08, 0x30, 0x02,   // x-size, y-size, offset, total characters
 (data),(data),(data),(data) // font data '0'
@@ -146,16 +146,10 @@ static const uint8_t FontBinaryExample[] =
 ```
 
 Some of the fonts packaged with library came from [URL](http://rinkydinkelectronics.com/).
-If you have picture of font like so.
-
-![ font ](https://github.com/gavinlyonsrepo/SSD1306_OLED_PICO/blob/main/extra/image/hallfetica_normal.png)
-
-There is a monochrome font maker there at [URL](http://rinkydinkelectronics.com/t_make_font_file_mono.php) 
-
 
 ### Bitmaps
 
-OLEDBitmap function will return an error if : The Bitmap is completely off screen , Invalid Bitmap pointer object, bitmap bigger than screen , bitmap bigger/smaller than provided width and height calculation ( This helps prevents buffer overflow). A horizontal addressed Bitmap's width MUST be divisible by 8. eg, for a bitmap with width=88 and height=48. Bitmap excepted size = (88/8) * 48 = 528 bytes.
+OLEDBitmap function will return an error code in event of an error. A horizontal addressed Bitmap's width MUST be divisible by 8. eg, for a bitmap with width=88 and height=48. Bitmap excepted size = (88/8) * 48 = 528 bytes.
 
 Bitmaps can be turned to data [here at link]( https://javl.github.io/image2cpp/) 
 See example file "_BITMAP" for more details.

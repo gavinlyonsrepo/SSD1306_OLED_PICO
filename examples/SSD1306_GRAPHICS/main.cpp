@@ -11,6 +11,7 @@
 
 // === Libraries ===
 #include <cstdio>
+
 #include "pico/stdlib.h"
 #include "ssd1306/SSD1306_OLED.hpp"
 
@@ -22,7 +23,8 @@ uint8_t screenBuffer[myScreenSize]; // Define a buffer to cover whole screen  12
 
 // I2C settings
 const uint16_t I2C_Speed = 100;
-const uint8_t I2C_Address = 0x3C;
+const uint8_t I2C_GPIO_CLK = 19;
+const uint8_t I2C_GPIO_DATA = 18;
 
 // instantiate  an OLED object
 SSD1306 myOLED(myOLEDwidth ,myOLEDheight);
@@ -37,7 +39,7 @@ void DisplayGraphics(void);
 void EndTest(void);
 
 // ======================= Main ===================
-int main(int argc, char **argv)
+int main()
 {
 	SetupTest();
 	DisplayGraphics();
@@ -52,12 +54,12 @@ void SetupTest()
 	stdio_init_all(); // Initialize chosen serial port, default 38400 baud
 	busy_wait_ms(500);
 	printf("OLED SSD1306 :: Start!\r\n");
-	while(myOLED.OLEDbegin(I2C_Address,i2c1,  I2C_Speed, 18, 19) != true)
+	while(myOLED.OLEDbegin(SSD1306::SSD1306_ADDR, i2c1,  I2C_Speed, I2C_GPIO_DATA, I2C_GPIO_CLK) != DisplayRet::Success)
 	{
 		printf("SetupTest ERROR : Failed to initialize OLED!\r\n");
 		busy_wait_ms(1500);
 	} // initialize the OLED
-	if (myOLED.OLEDSetBufferPtr(myOLEDwidth, myOLEDheight, screenBuffer, sizeof(screenBuffer)/sizeof(uint8_t)) != 0)
+	if (myOLED.OLEDSetBufferPtr(myOLEDwidth, myOLEDheight, screenBuffer) != DisplayRet::Success)
 	{
 		printf("SetupTest : ERROR : OLEDSetBufferPtr Failed!\r\n");
 		while(1){busy_wait_ms(1000);}
@@ -91,26 +93,26 @@ void  DisplayGraphics()
 		colour = !colour;
 
 		// Draw the X
-		myOLED.drawLine(64,  0, 64, 64, WHITE);
-		myOLED.drawFastVLine(62, 0, 64, WHITE);
-		myOLED.drawFastHLine(0, 32, 128, WHITE);
+		myOLED.drawLine(64,  0, 64, 64, SSD1306::WHITE);
+		myOLED.drawFastVLine(62, 0, 64, SSD1306::WHITE);
+		myOLED.drawFastHLine(0, 32, 128, SSD1306::WHITE);
 
 		// Q1
 		myOLED.fillRect(0, 10, 20, 20, colour);
-		myOLED.fillCircle(40, 20, 10, WHITE);
+		myOLED.fillCircle(40, 20, 10, SSD1306::WHITE);
 
 		// Q2
 		myOLED.fillTriangle(80, 25, 90, 5, 100, 25, !colour);
-		myOLED.drawRect(105, 10, 15, 15, WHITE);
+		myOLED.drawRect(105, 10, 15, 15, SSD1306::WHITE);
 		// Q3
 		myOLED.fillRoundRect(0, 40, 40, 20, 10, !colour);
 		// Q4
 		char i;
 		for (i = 0; i < 10; i ++)
 		{
-			myOLED.drawRect(70 + i, 40 + i, 50 - i * 2, 20 - i * 2, WHITE);
+			myOLED.drawRect(70 + i, 40 + i, 50 - i * 2, 20 - i * 2, SSD1306::WHITE);
 			myOLED.OLEDupdate();
-			busy_wait_ms(50);
+			busy_wait_ms(25);
 		}
 		myOLED.OLEDclearBuffer();
 		count++;

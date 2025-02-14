@@ -9,48 +9,6 @@
 #include "../../include/ssd1306/SSD1306_OLED_font.hpp"
 #include "../../include/ssd1306/SSD1306_OLED.hpp"
 
-// === Font class implementation ===
-/*!
-	@brief init the OLED  font class object constructor
- */
-SSD1306_OLEDFonts::SSD1306_OLEDFonts(){};
-
-/*!
-	@brief SSD1306_SetFont
-	@param  SelectedFontName Select this font, pass the font pointer name 
-	@return	Will return
-		-# 0. Success
-		-# 2. Not a valid pointer object.
- */
-uint8_t SSD1306_OLEDFonts::setFont(const uint8_t * SelectedFontName) {
-	if (SelectedFontName == nullptr)
-	{
-		printf("SSD1306_OLEDFonts::setFont ERROR 2: Invalid pointer object\r\n");
-		return 2;
-	}
-	_FontSelect   = SelectedFontName;
-	_Font_X_Size  = *(SelectedFontName + 0);
-	_Font_Y_Size  = *(SelectedFontName + 1);
-	_FontOffset   = *(SelectedFontName + 2);
-	_FontNumChars = *(SelectedFontName + 3);
-	_FontInverted = false;
-	return 0;
-}
-
-/*!
-	@brief setInvertFont
-	@param invertStatus set the invert status flag of font ,false = off. 
-*/
-void SSD1306_OLEDFonts::setInvertFont(bool invertStatus) {
-	 _FontInverted = invertStatus;
-}
-
-/*!
-	@brief getInvertFont
-	@return invert status flag of font ,false = off. 
-*/
-bool SSD1306_OLEDFonts::getInvertFont()
-{ return _FontInverted; }
 
 // === Graphics class implementation ===
 
@@ -71,15 +29,15 @@ SSD1306_graphics::SSD1306_graphics(int16_t w, int16_t h):
 
 /*!
 	@brief Write 1 character on OLED.
-	@param  x character starting position on x-axis. Valid values: 0..127
-	@param  y character starting position on x-axis. Valid values: 0..63
+	@param  x character starting position on x-axis.
+	@param  y character starting position on x-axis.
 	@param  value Character to be written.
 	@return Will return
-		-# 0 success
-		-# 2 co-ords out of bounds check x and y
-		-# 3 Character out of ASCII Font bounds, check Font range
+		-# Success
+		-# CharScreenBounds co-ords out of bounds check x and y
+		-# CharFontASCIIRange Character out of ASCII Font bounds, check Font range
  */
-uint8_t SSD1306_graphics::writeChar(int16_t x, int16_t y, char value) {
+DisplayRet::Ret_Codes_e SSD1306_graphics::writeChar(int16_t x, int16_t y, char value) {
 	uint16_t fontIndex = 0;
 	uint16_t rowCount = 0;
 	uint16_t count = 0;
@@ -95,13 +53,13 @@ uint8_t SSD1306_graphics::writeChar(int16_t x, int16_t y, char value) {
 	((y + _Font_Y_Size) < 0))   // Clip top
 	{
 		printf("SSD1306_graphics::writeChar Error 2: Co-ordinates out of bounds \r\n");
-		return 2;
+		return DisplayRet::CharScreenBounds;
 	}
 	// 2. Check for character out of font range bounds
 	if ( value < _FontOffset || value >= (_FontOffset + _FontNumChars + 1))
 	{
 		printf("SSD1306_graphics::writeChar Error 3: Character out of Font bounds  %c : %u<->%u \r\n", value  ,_FontOffset, _FontOffset + _FontNumChars);
-		return 3;
+		return DisplayRet::CharFontASCIIRange;
 	}
 	if (_Font_Y_Size % 8 == 0) // Is the font height divisible by 8
 	{
@@ -110,7 +68,8 @@ uint8_t SSD1306_graphics::writeChar(int16_t x, int16_t y, char value) {
 		{
 			for (count = 0; count < _Font_X_Size; count++) 
 			{
-				temp = *(_FontSelect + fontIndex + count + (rowCount * _Font_X_Size));
+				//temp = *(_FontSelect + fontIndex + count + (rowCount * _Font_X_Size));
+				temp = _FontSelect[fontIndex + count + (rowCount * _Font_X_Size)];
 				for (colIndex = 0; colIndex < 8; colIndex++) 
 				{
 					if (temp & (1 << colIndex)) {
@@ -124,7 +83,7 @@ uint8_t SSD1306_graphics::writeChar(int16_t x, int16_t y, char value) {
 	} else 
 	{
 		fontIndex = ((value - _FontOffset)*((_Font_X_Size * _Font_Y_Size) / 8)) + 4;
-		colByte = *(_FontSelect + fontIndex);
+		colByte = _FontSelect[fontIndex];
 		colbit = 7;
 		for (cx = 0; cx < _Font_X_Size; cx++) 
 		{
@@ -139,12 +98,12 @@ uint8_t SSD1306_graphics::writeChar(int16_t x, int16_t y, char value) {
 				if (colbit < 0) {
 					colbit = 7;
 					fontIndex++;
-					colByte = *(_FontSelect + fontIndex);
+					colByte = _FontSelect[fontIndex];
 				}
 			}
 		}
 	}
-	return 0;
+	return DisplayRet::Success;
 }
 
 /*!
@@ -154,18 +113,19 @@ uint8_t SSD1306_graphics::writeChar(int16_t x, int16_t y, char value) {
 	@param  pText Pointer to the array of the text to be written.
 	@return Will return
 		-# 0 Success
-		-# 2 String pText Array invalid pointer object
-		-# 3 Failure in writeChar method upstream
+		-# CharArrayNullptr  String pText Array invalid pointer object
+		-# Failure in writeChar method upstream, that error code will be returned
  */
-uint8_t SSD1306_graphics::writeCharString(int16_t x, int16_t y, char * pText) {
+DisplayRet::Ret_Codes_e SSD1306_graphics::writeCharString(int16_t x, int16_t y, char * pText) {
 	uint8_t count=0;
 	uint8_t MaxLength=0;
 	// Check for null pointer
 	if(pText == nullptr)
 	{
 		print("SSD1306_graphics::writeCharString Error 2 :String array is not valid pointer\n");
-		return 2;
+		return DisplayRet::CharArrayNullptr ;
 	}
+	DisplayRet::Ret_Codes_e DrawCharReturnCode;
 	while(*pText != '\0')
 	{
 		// check if text has reached end of screen
@@ -175,13 +135,13 @@ uint8_t SSD1306_graphics::writeCharString(int16_t x, int16_t y, char * pText) {
 			x = 0;
 			count = 0;
 		}
-		if(writeChar(x + (count * (_Font_X_Size)), y, *pText++) != 0)
-			return 3;
+		DrawCharReturnCode = writeChar(x + (count * (_Font_X_Size)), y, *pText++);
+		if(DrawCharReturnCode  != DisplayRet::Success) return DrawCharReturnCode;
 		count++;
 		MaxLength++;
-		if (MaxLength >= 150) break; // 2nd way out of loop, safety check
+		if (MaxLength >= 200) break; // 2nd way out of loop, safety check
 	}
-	return 0;
+	return DisplayRet::Success;
 }
 
 /*! 
@@ -189,10 +149,12 @@ uint8_t SSD1306_graphics::writeCharString(int16_t x, int16_t y, char * pText) {
 	@param character the character to print
 	@return Will return
 		-# 1. success
-		-# -1. An error in the writeChar method.
+		-# Ret_Codes_e enum error code An error in the writeChar method.
+
 */
 size_t SSD1306_graphics::write(uint8_t character) 
 {
+	DisplayRet::Ret_Codes_e DrawCharReturnCode;
 	switch (character)
 	{
 		case '\n': 
@@ -201,7 +163,13 @@ size_t SSD1306_graphics::write(uint8_t character)
 		break;
 		case '\r': break;
 		default:
-			if(writeChar(_cursor_x, _cursor_y, character) != 0 ) return -1;
+			DrawCharReturnCode = writeChar(_cursor_x, _cursor_y, character);
+			if (DrawCharReturnCode != DisplayRet::Success) 
+			{
+				// Set the write error based on the result of the drawing operation
+				setWriteError(DrawCharReturnCode); // Set error flag to non-zero value}
+				break;
+			}
 			_cursor_x += (_Font_X_Size);
 			if (_textwrap && (_cursor_x  > (_width - (_Font_X_Size)))) 
 			{
@@ -353,13 +321,13 @@ void SSD1306_graphics::drawLine(int16_t x0, int16_t y0,
 				uint8_t color) {
 	int16_t steep = abs(y1 - y0) > abs(x1 - x0);
 	if (steep) {
-	swapOLEDPICO(x0, y0);
-	swapOLEDPICO(x1, y1);
+	swapInt16_OLED(x0, y0);
+	swapInt16_OLED(x1, y1);
 	}
 
 	if (x0 > x1) {
-	swapOLEDPICO(x0, x1);
-	swapOLEDPICO(y0, y1);
+	swapInt16_OLED(x0, x1);
+	swapInt16_OLED(y0, y1);
 	}
 
 	int16_t dx, dy;
@@ -530,13 +498,13 @@ void SSD1306_graphics::fillTriangle ( int16_t x0, int16_t y0,
 	int16_t a, b, y, last;
 
 	if (y0 > y1) {
-	swapOLEDPICO(y0, y1); swapOLEDPICO(x0, x1);
+	swapInt16_OLED(y0, y1); swapInt16_OLED(x0, x1);
 	}
 	if (y1 > y2) {
-	swapOLEDPICO(y2, y1); swapOLEDPICO(x2, x1);
+	swapInt16_OLED(y2, y1); swapInt16_OLED(x2, x1);
 	}
 	if (y0 > y1) {
-	swapOLEDPICO(y0, y1); swapOLEDPICO(x0, x1);
+	swapInt16_OLED(y0, y1); swapInt16_OLED(x0, x1);
 	}
 
 	if(y0 == y2) { 
@@ -569,7 +537,7 @@ void SSD1306_graphics::fillTriangle ( int16_t x0, int16_t y0,
 	sa += dx01;
 	sb += dx02;
 
-	if(a > b) swapOLEDPICO(a,b);
+	if(a > b) swapInt16_OLED(a,b);
 	drawFastHLine(a, y, b-a+1, color);
 	}
 
@@ -581,7 +549,7 @@ void SSD1306_graphics::fillTriangle ( int16_t x0, int16_t y0,
 	b   = x0 + sb / dy02;
 	sa += dx12;
 	sb += dx02;
-	if(a > b) swapOLEDPICO(a,b);
+	if(a > b) swapInt16_OLED(a,b);
 	drawFastHLine(a, y, b-a+1, color);
 	}
 }
@@ -624,24 +592,24 @@ int16_t SSD1306_graphics::height(void) const {
 	@brief Gets the _rotation of the display 
 	@return _rotation value 0-3
 */
-displayBC_rotate_e SSD1306_graphics::getRotation(void)  {
-	return _display_rotate;;
+SSD1306_graphics::display_rotate_e SSD1306_graphics::getRotation(void)  {
+	return _display_rotate;
 }
 
  /*!
 	@brief Sets the _rotation of the display 
-	@param x _rotation value 0-3
+	@param  CurrentRotation _ enum rotation value
 */
-void SSD1306_graphics::setRotation(displayBC_rotate_e CurrentRotation) {
+void SSD1306_graphics::setRotation(display_rotate_e CurrentRotation) {
 	_display_rotate = CurrentRotation;
 	switch(CurrentRotation) {
-	 case 0:
-	 case 2:
+	 case rDegrees_0:
+	 case rDegrees_180:
 		_width  = WIDTH;
 		_height = HEIGHT;
 		break;
-	 case 1:
-	 case 3:
+	 case rDegrees_90:
+	 case rDegrees_270:
 		_width  = HEIGHT;
 		_height = WIDTH;
 		break;

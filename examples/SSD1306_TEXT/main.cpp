@@ -21,16 +21,15 @@
 		13. Test 713 println + print & textwrap 
 		14. Test 714 print method String object 
 		15. Test 715 print method numbers 
+		16. Test 808 Error checking test functions
 */
 
 // === Libraries ===
 #include <cstdio>
-#include "pico/stdlib.h"
-#include "ssd1306/SSD1306_OLED.hpp"
 
-// Test timing parameters
-#define DisplayDelay4 4000
-#define DisplayDelay2 2000
+#include "pico/stdlib.h"
+#include <vector> // for test 808 only
+#include "ssd1306/SSD1306_OLED.hpp"
 
 // Screen settings
 #define myOLEDwidth  128
@@ -38,15 +37,22 @@
 #define myScreenSize (myOLEDwidth * (myOLEDheight/8)) // eg 1024 bytes = 128 * 64/8
 uint8_t screenBuffer[myScreenSize]; // Define a buffer to cover whole screen  128 * 64/8
 
+// Test timing parameters
+#define DisplayDelay4 4000
+#define DisplayDelay2 2000
+
 // I2C settings
 const uint16_t I2C_Speed = 100;
-const uint8_t I2C_Address = 0x3C;
+const uint8_t I2C_GPIO_CLK = 19;
+const uint8_t I2C_GPIO_DATA = 18;
 
 // instantiate  an OLED object
 SSD1306 myOLED(myOLEDwidth ,myOLEDheight);
 
 // =============== Function prototype ================
 void SetupTest(void);
+void EndTest(void);
+void TestReset(void);
 
 void Test701(void);
 void Test702(void);
@@ -58,17 +64,14 @@ void Test707(void);
 void Test708(void);
 void Test709(void);
 void Test710(void);
-
 void Test711(void);
 void Test712(void);
 void Test713(void);
 void Test714(void);
 void Test715(void);
+void Test808(void);
 
-void EndTest(void);
-void TestReset(void);
-void testErrorCheck(void);
-// ======================= Main ===================
+// ==================== Main ===================
 int main() 
 {
 	SetupTest();
@@ -83,13 +86,12 @@ int main()
 	Test708();
 	Test709();
 	Test710();
-
 	Test711();
 	Test712();
 	Test713();
 	Test714();
 	Test715();
-	testErrorCheck();
+	Test808();
 	EndTest();
 }
 // ======================= End of main  ===================
@@ -100,12 +102,12 @@ void SetupTest()
 	stdio_init_all(); // Initialize chosen serial port, default 38400 baud
 	busy_wait_ms(500);
 	printf("OLED SSD1306 :: Start!\r\n");
-	while(myOLED.OLEDbegin(I2C_Address,i2c1,  I2C_Speed, 18, 19) != true)
+	while(myOLED.OLEDbegin(SSD1306::SSD1306_ADDR, i2c1, I2C_Speed, I2C_GPIO_DATA, I2C_GPIO_CLK) != DisplayRet::Success)
 	{
 		printf("SetupTest ERROR : Failed to initialize OLED!\r\n");
 		busy_wait_ms(1500);
 	} // initialize the OLED
-	if (myOLED.OLEDSetBufferPtr(myOLEDwidth, myOLEDheight, screenBuffer, sizeof(screenBuffer)/sizeof(uint8_t)) != 0)
+	if (myOLED.OLEDSetBufferPtr(myOLEDwidth, myOLEDheight, screenBuffer) != DisplayRet::Success)
 	{
 		printf("SetupTest : ERROR : OLEDSetBufferPtr Failed!\r\n");
 		while(1){busy_wait_ms(1000);}
@@ -319,13 +321,13 @@ void Test712(void)
 	printf("OLED Test 712 Base number systems using print \r\n");
 	myOLED.setFont(pFontDefault);
 	myOLED.setCursor(0, 0);
-	myOLED.print(47 , DEC);
+	myOLED.print(47 , myOLED.DEC);
 	myOLED.setCursor(0, 16);
-	myOLED.print(47 , HEX); 
+	myOLED.print(47 , myOLED.HEX); 
 	myOLED.setCursor(0, 32);
-	myOLED.print(47, BIN);
+	myOLED.print(47, myOLED.BIN);
 	myOLED.setCursor(0, 48);
-	myOLED.print(47 , OCT);
+	myOLED.print(47 , myOLED.OCT);
 	TestReset();
 }
 
@@ -375,6 +377,98 @@ void Test715(void)
 	TestReset();
 }
 
+void Test808(void)
+{
+	// Error checking
+	printf("==== Test 808 Start Error checking ====\n");
+	// Define the expected return values
+	std::vector<uint8_t> expectedErrors = 
+	{
+		DisplayRet::CharFontASCIIRange, DisplayRet::CharFontASCIIRange, DisplayRet::Success, DisplayRet::CharArrayNullptr,
+		DisplayRet::Success, DisplayRet::CharFontASCIIRange, DisplayRet::CharFontASCIIRange,
+		DisplayRet::CharFontASCIIRange, DisplayRet::CharScreenBounds, DisplayRet::CharScreenBounds,
+		DisplayRet::CharScreenBounds, DisplayRet::CharScreenBounds, DisplayRet::CharArrayNullptr
+	};
+	
+	// Vector to store return values
+	std::vector<uint8_t> returnValues; 
+
+	char testlowercase[] = "ZA[ab";
+	char testNonNumExtend[] = "-;A";
+	bool errorFlag = false;
+	myOLED.setFont(pFontWide);
+
+	// (1) Print statement test, wide font lower case letters
+	// We check print class error flag as print statement does not return errors it returns num of characters
+	// it attempted to print. Always clear error flag before checking getWriteError after new print
+	myOLED.setCursor(40,40);
+	myOLED.print("ABc"); // Print AB , return 3 (num of characters)
+	returnValues.push_back(myOLED.getWriteError()); // return error
+	myOLED.clearWriteError(); // Reset error flag
+	myOLED.print("abC");  // print C , return 3 (num of characters)
+	returnValues.push_back(myOLED.getWriteError()); // return error
+	myOLED.clearWriteError(); // Reset error flag
+	myOLED.print("12345"); // print 12345 , return 5 (num of characters)
+	returnValues.push_back(myOLED.getWriteError()); // return pass
+	myOLED.clearWriteError(); // Reset error flag
+	myOLED.print(nullptr);  // return 0 (num of characters)
+	returnValues.push_back(myOLED.getWriteError());  // return error
+	myOLED.clearWriteError(); // Reset error flag
+	TestReset();
+	printf("========\r\n");
+	// (2) writeChar + writeCharString
+	// lower case + ] character out of font bounds
+	returnValues.push_back(myOLED.writeChar(32, 0, '!')); //success
+	returnValues.push_back(myOLED.writeCharString(5,  5, testlowercase)); //throw font error 2
+	TestReset();
+	// Numeric extended bounds ; , A errors
+	myOLED.setFont(pFontSixteenSeg);
+	returnValues.push_back(myOLED.writeCharString(0, 0, testNonNumExtend)); //throw font error 2
+	returnValues.push_back(myOLED.writeChar(32, 0, ',')); //throw error 2
+	TestReset();
+	printf("========\r\n");
+	// screen out of bounds
+	myOLED.setFont(pFontDefault);
+	returnValues.push_back(myOLED.writeChar(0, 400, 'e')); //throw error 1
+	returnValues.push_back(myOLED.writeChar(400, 0, 'f')); //throw error 1
+	TestReset();
+	myOLED.setFont(pFontPico);
+	returnValues.push_back(myOLED.writeChar(0, 400, 'A')); //throw error 1
+	returnValues.push_back(myOLED.writeChar(400, 0, 'B')); //throw error 1
+	TestReset();
+	
+	returnValues.push_back(myOLED.writeCharString(5, 5, nullptr)); //throw error 
+	
+	//== SUMMARY SECTION===
+	printf("\nError Checking Summary.\n");
+	// Check return values against expected errors
+	for (size_t i = 0; i < returnValues.size(); ++i) {
+		if (i >= expectedErrors.size() || returnValues[i] != expectedErrors[i]) {
+			errorFlag = true;
+			printf("Unexpected error code: %d at test case %zu (expected: %d)\n", 
+				returnValues[i], i + 1, (i < expectedErrors.size() ? expectedErrors[i] : -1));
+		}
+	}
+		// Print all expectedErrors for summary
+	for (uint8_t value : expectedErrors ) 
+	{
+		printf("%d ", value);
+	}
+	printf("\n");
+	// Print all returnValues for summary
+	for (uint8_t value : returnValues) 
+	{
+		printf("%d ", value);
+	}
+	if (errorFlag == true ){
+		printf("\nError Checking has FAILED.\n");
+	}else{
+		printf("\nError Checking has PASSED.\n");
+	}
+	printf("\n=== STOP Error checking. ===\r\n");
+}
+
+
 void TestReset(void){
 	myOLED.OLEDupdate();
 	busy_wait_ms(DisplayDelay4);
@@ -388,35 +482,4 @@ void EndTest()
 	printf("OLED SSD1306 :: End\r\n");
 }
 
-void testErrorCheck(void)
-{
-	// Error checking
-	printf("==== Test 720 Start Error checking ====\r\n");
-	printf("Result = 3 3 3 2 2 2 2 ===\r\n");
-	char testlowercase[] = "ZA[ab";
-	char testNonNumExtend[] = "-:;A";
-
-	// character out of font bounds
-	// wide & thick lower case + ]
-	myOLED.setFont(pFontWide);
-	myOLED.writeCharString(5,  5, testlowercase); //throw wide font error 2
-	myOLED.writeChar(32, 0, '!');
-	TestReset();
-	// Numeric extended bounds ; , A errors
-	myOLED.setFont(pFontSixteenSeg);
-	myOLED.writeCharString(0, 0, testNonNumExtend); //throw font error 2
-	myOLED.writeChar(32, 0, ','); //throw error 2
-	TestReset();
-	printf("========\r\n");
-	// screen out of bounds
-	myOLED.setFont(pFontDefault);
-	myOLED.writeChar(0, 100, 'e'); //throw error 1
-	myOLED.writeChar(150, 0, 'f'); //throw error 1
-	TestReset();
-	myOLED.setFont(pFontArialBold);
-	myOLED.writeChar(0, 100, 'A'); //throw error 1
-	myOLED.writeChar(150, 0, 'B'); //throw error 1
-	TestReset();
-	printf("==== Stop Error checking ====\r\n");
-}
 // ============== EOF =========
