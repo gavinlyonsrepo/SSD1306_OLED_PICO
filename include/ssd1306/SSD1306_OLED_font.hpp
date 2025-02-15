@@ -46,9 +46,8 @@ class SSD1306_OLEDFonts
 		void setInvertFont(bool invertStatus);
 		bool getInvertFont(void);
 
-		std::span<const uint8_t> _FontSelect = pFontDefault; /**< Active font */ /**< Pointer to the active font,  Fonts Stored are Const */
-
 	protected:
+		std::span<const uint8_t> _FontSelect = pFontDefault; /**< span to the active font,  Fonts Stored are Const */
 		uint8_t _Font_X_Size = 0x06; /**< Width Size of a Font character */
 		uint8_t _Font_Y_Size = 0x08; /**< Height Size of a Font character */
 		uint8_t _FontOffset = 0x00; /**< Offset in the ASCII table 0x00 to 0xFF, where font begins */
