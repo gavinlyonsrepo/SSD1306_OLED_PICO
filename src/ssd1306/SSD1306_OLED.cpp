@@ -250,7 +250,7 @@ void SSD1306::OLEDFillPage(uint8_t page_num, uint8_t dataPattern,uint8_t mydelay
 		-# BitmapLargerThanScreen Bitmap is larger than screen, check w and h
 		-# BitmapEmpty Bitmap is an invalid object
 		-# BitmapHorizontalSize Check Horizontal bitmap size
-	@note bitmap data must be  horizontally addressed and height divisible by 8
+	@note bitmap data must be  horizontally addressed and width divisible by 8
 */
 DisplayRet::Ret_Codes_e SSD1306::OLEDBitmap(int16_t x, int16_t y, int16_t w, int16_t h, std::span<const uint8_t>  pBitmap, bool invert)
 {
