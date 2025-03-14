@@ -136,16 +136,24 @@ First 4 bytes are control bytes followed by vertically addressed font data.
 ```
 // An 4 by 8 character size font starting at 
 // ASCII offset 0x30 in ASCII table with 0x02 characters in font. 
-// 0 and 1 
+// '0' and '1' 
 static const std::array<uint8_t, 12>FontBinaryExample[] =
 {
-0x04, 0x08, 0x30, 0x02,   // x-size, y-size, offset, total characters
-(data),(data),(data),(data) // font data '0'
-(data),(data),(data),(data) // font data '1'
+0x04, 0x08, 0x30, 0x01,   // x-size, y-size, offset, total characters-1
+(data),(data),(data),(data) // font data '0' , 0x30
+(data),(data),(data),(data) // font data '1' , 0x31
 }
 ```
 
-Some of the fonts packaged with library came from [URL](http://rinkydinkelectronics.com/).
+*Sources*
+
+1. Some of the fonts packaged with library came from [URL](http://rinkydinkelectronics.com/)
+2. These fonts have horizontally addressed data by default.
+3. They must be converted to vertically addressed font data if user wants them for SSD1306_OLED_PICO.
+4. There is a monochrome font maker there at [URL](http://rinkydinkelectronics.com/t_make_font_file_mono.php),
+5. Just upload the picture of font from URL links on step 1 to it. 
+6. The font you pick MUST have : Height(or y-size) must be divisible evenly by 8. (Width X Height)
+
 
 ### Bitmaps
 
