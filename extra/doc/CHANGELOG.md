@@ -16,5 +16,7 @@
 	* corrected 'drawPixel' boundary scan for 90 and 270 degree rotation. 
 * Version 1.1.0 Feb 25
 	* Added Error enum and improved error handling 
-	* Removed use of most raw pointers.
-	* Improved Namespace situation(removed most macros etc)
+* Version 2.0.0 Mar 2025
+	* Changed project name from SSD1306_OLED_PICO to displaylib_1bit_PICO
+	* Added support for erm19264, nokia5110 , Sh1106 sh1107 and ch1115 displays
+	* Added Advanced graphics options.
