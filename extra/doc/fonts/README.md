@@ -61,9 +61,11 @@ static const std::array<uint8_t, 12>FontBinaryExample[] =
 
 *Sources*
 
-1. Some of the fonts packaged with library came from [URL](http://rinkydinkelectronics.com/)
+1. Some of the fonts packaged with library came from [URL LINK](http://rinkydinkelectronics.com/)
 2. These fonts have horizontally addressed data by default.
 3. They must be converted to vertically addressed font data if user wants them for library.
 4. There is a monochrome font maker there at [URL](http://rinkydinkelectronics.com/t_make_font_file_mono.php),
 5. Just upload the picture of font from URL links on step 1 to it. 
 6. The font you pick MUST have : Height(or y-size) must be divisible evenly by 8. (Width X Height)
+
+Another source for vertical fonts is [URL LINK](https://jared.geek.nz/2014/01/custom-fonts-for-microcontrollers/)

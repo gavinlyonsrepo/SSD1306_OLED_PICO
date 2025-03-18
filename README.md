@@ -47,10 +47,10 @@
 
 | Component name | Type | Interface | Readme URL link |
 | -------- | ---------- | --------- | ---------- |
-| ERM19264 UC1609| LCD|SPI HW & SW| [Readme](extra/doc/erm19264/README.md) |
-| PCD8544| LCD|SPI HW & SW| [Readme](extra/doc/nokia5110/README.md) |
-| ERM1 CH1115 | OLED |SPI HW & SW| [Readme](extra/doc/ch1115/README.md) |
-| SSD1306|BOLED| I2C | [Readme](extra/doc/ssd1306/README.md) |
+| ERM19264 UC1609| LCD|SPI| [Readme](extra/doc/erm19264/README.md) |
+| PCD8544| LCD|SPI  | [Readme](extra/doc/nokia5110/README.md) |
+| ERM1 CH1115 | OLED |SPI| [Readme](extra/doc/ch1115/README.md) |
+| SSD1306|OLED| I2C | [Readme](extra/doc/ssd1306/README.md) |
 | SH1106 SH1107| OLED | I2C | [Readme](extra/doc/sh110x/README.md) |
 
 
@@ -85,14 +85,14 @@ This will disable advanced graphics mode.
 
 ### Print
 
-The print class can print integers, floats, Characters, character arrays
+The print class can print integers, floats, characters, character arrays
 and C++ std::strings. It can also format floating point numbers to a number of 
-decimal places. and Format integers in different base number systems.
+decimal places. and format integers in different base number systems.
 Support for other data types can be added. 
 
 ### File system
 
-Class diagram
+Class diagram:
 
 ![image link](https://github.com/gavinlyonsrepo/displaylib_1bit_PICO/blob/main/extra/image/file.png)
 

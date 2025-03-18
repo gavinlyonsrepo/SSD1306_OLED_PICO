@@ -14,10 +14,9 @@
 * Description:
 
 0. C++ Library for Nokia 5110 LCD, PCD8544 Driver. 84 x 48 pixels.
-1. Dynamic install-able Linux based Single Board Computers C++ library.
-2. Invert colour, rotate, sleep, contrast bias control supported.
-3. Bitmaps supported.
-4. Hardware SPI
+1. Invert colour, rotate, sleep, contrast bias control supported.
+2. Bitmaps supported.
+3. Hardware SPI
 
 * Author: Gavin Lyons
 
@@ -26,7 +25,8 @@
 
 The Nokia 5110 is a basic graphic LCD screen for lots of applications.
 GPIO function on RPI, 5 Nokia 5110 LCD lines SPI bus. Use any GPIO user likes for Software SPI.
-For Hardware the user can use any GPIO for reset and data/command line
+For Hardware the user can use any GPIO for reset and data/command line.
+The driver chip is PCD8544.
 
 Example file set up :
 
